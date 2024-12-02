@@ -3,13 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pháo Hoa Giống Thật</title>
+    <title>Pháo hoa và dòng chữ</title>
     <style>
-        body {
+        html, body {
             margin: 0;
-            background-color: #006b68;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black; /* Nền đen */
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        #container {
+            position: relative;
+            width: 1080px;
+            height: 1920px;
+            background-color: black;
+        }
+
         canvas {
             position: absolute;
             top: 0;
@@ -17,15 +31,37 @@
             width: 100%;
             height: 100%;
         }
+
+        .text-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10; /* Luôn nằm trên cùng */
+        }
+
+        .text-container h1 {
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 3rem;
+            text-align: center;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
-    <canvas id="fireworks"></canvas>
+    <div id="container">
+        <canvas id="fireworks"></canvas>
+        <div class="text-container">
+            <h1>TEST HTML</h1>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById('fireworks');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = 1080;
+        canvas.height = 1920;
 
         class Firework {
             constructor(x, y, targetY) {
@@ -70,10 +106,10 @@
                 this.x = x;
                 this.y = y;
                 this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 6 - 3;
-                this.speedY = Math.random() * 6 - 3;
-                this.gravity = 0.05;
-                this.life = Math.random() * 60 + 40;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.gravity = 0.02;
+                this.life = Math.random() * 100 + 80;
                 this.opacity = 1;
                 this.color = color;
             }
@@ -81,7 +117,7 @@
                 this.x += this.speedX;
                 this.y += this.speedY + this.gravity;
                 this.life -= 1;
-                this.opacity -= 0.01;
+                this.opacity -= 0.008;
             }
             draw() {
                 if (this.life > 0) {
@@ -90,7 +126,7 @@
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.globalAlpha = 1; // Reset alpha
+                    ctx.globalAlpha = 1;
                 }
             }
         }
@@ -121,8 +157,8 @@
         animate();
 
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvas.width = 1080;
+            canvas.height = 1920;
         });
     </script>
 </body>
