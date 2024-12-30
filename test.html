@@ -1,165 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pháo hoa và dòng chữ</title>
+    <title>Hiển thị ảnh với pháo hoa</title>
     <style>
-        html, body {
+        body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: black; /* Nền đen */
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
-
         #container {
             position: relative;
-            width: 1080px;
-            height: 1920px;
-            background-color: black;
+            width: 100vw;
+            height: 100vh;
         }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        #background-image {
+            display: block;
             width: 100%;
             height: 100%;
+            object-fit: cover;
         }
-
-        .text-container {
+        .firework {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10; /* Luôn nằm trên cùng */
+            width: 2px; /* Độ rộng của "tia" pháo hoa */
+            height: 20px; /* Chiều cao ban đầu của "tia" pháo hoa */
+            background-color: white; /* Màu của "tia" pháo hoa */
+            bottom: 0;
+            opacity: 1;
+            transform-origin: bottom center; /* Điểm neo cho transform */
+            pointer-events: none;
         }
-
-        .text-container h1 {
-            color: white;
-            font-family: Arial, sans-serif;
-            font-size: 3rem;
-            text-align: center;
-            margin: 0;
+        .particle {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <canvas id="fireworks"></canvas>
-        <div class="text-container">
-            <h1>TEST HTML</h1>
-        </div>
+        <img id="background-image" src="1.jpg" alt="Ảnh nền">
     </div>
-
     <script>
-        const canvas = document.getElementById('fireworks');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 1080;
-        canvas.height = 1920;
-
-        class Firework {
-            constructor(x, y, targetY) {
-                this.x = x;
-                this.y = y;
-                this.targetY = targetY;
-                this.speedY = -10;
-                this.exploded = false;
-                this.particles = [];
-                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            }
-            update() {
-                if (!this.exploded) {
-                    this.y += this.speedY;
-                    if (this.y <= this.targetY) {
-                        this.explode();
-                    }
-                } else {
-                    this.particles.forEach(particle => particle.update());
-                }
-            }
-            draw() {
-                if (!this.exploded) {
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    this.particles.forEach(particle => particle.draw());
-                }
-            }
-            explode() {
-                this.exploded = true;
-                for (let i = 0; i < 100; i++) {
-                    this.particles.push(new Particle(this.x, this.y, this.color));
-                }
-            }
-        }
-
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 4 - 2;
-                this.speedY = Math.random() * 4 - 2;
-                this.gravity = 0.02;
-                this.life = Math.random() * 100 + 80;
-                this.opacity = 1;
-                this.color = color;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY + this.gravity;
-                this.life -= 1;
-                this.opacity -= 0.008;
-            }
-            draw() {
-                if (this.life > 0) {
-                    ctx.fillStyle = this.color;
-                    ctx.globalAlpha = this.opacity;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.globalAlpha = 1;
-                }
-            }
-        }
-
+        const container = document.getElementById('container');
+        const numFireworks = 5;
         const fireworks = [];
-        function animate() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            if (Math.random() < 0.05) {
-                const x = Math.random() * canvas.width;
-                const y = canvas.height;
-                const targetY = Math.random() * canvas.height / 2;
-                fireworks.push(new Firework(x, y, targetY));
-            }
+        function createFirework() {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            container.appendChild(firework);
 
-            fireworks.forEach((firework, index) => {
-                firework.update();
-                firework.draw();
-                if (firework.exploded && firework.particles.every(p => p.life <= 0)) {
-                    fireworks.splice(index, 1);
-                }
-            });
+            const startX = Math.random() * container.offsetWidth;
+            const startY = container.offsetHeight;
+            const endY = Math.random() * container.offsetHeight * 0.4;
+            const duration = 2000 + Math.random() * 1000;
 
-            requestAnimationFrame(animate);
+            firework.style.left = startX + 'px';
+            firework.style.bottom = '0px';
+
+            firework.animate([
+                { transform: 'translateY(0)', opacity: 1 }, // Điểm bắt đầu
+                { transform: `translateY(-${startY - endY}px)`, opacity: 1 } // Điểm kết thúc
+            ], {
+                duration: duration,
+                easing: 'ease-out',
+                iterations: 1
+            }).onfinish = () => {
+                explode(firework, startX, endY);
+                firework.remove();
+                fireworks.splice(fireworks.indexOf(firework), 1);
+            };
         }
 
-        animate();
+        function explode(firework, x, y) {
+            const numParticles = 30 + Math.floor(Math.random() * 20);
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = particle.style.height = (2 + Math.random() * 3) + 'px';
+                particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                container.appendChild(particle);
 
-        window.addEventListener('resize', () => {
-            canvas.width = 1080;
-            canvas.height = 1920;
-        });
+                const angle = Math.random() * 360;
+                const speed = 2 + Math.random() * 3;
+                const vx = speed * Math.cos(angle * Math.PI / 180);
+                const vy = speed * Math.sin(angle * Math.PI / 180);
+
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+
+                particle.animate([
+                    { opacity: 1, transform: 'translate(0, 0)' },
+                    { opacity: 0, transform: `translate(${vx * 50}px, ${vy * 50}px)` }
+                ], {
+                    duration: 1000,
+                    easing: 'ease-out',
+                    iterations: 1
+                }).onfinish = () => particle.remove();
+            }
+        }
+
+        setInterval(() => {
+            if (fireworks.length < numFireworks) {
+                createFirework();
+            }
+        }, 1500);
     </script>
 </body>
 </html>
